@@ -104,6 +104,16 @@
   .meta a { color: var(--accent); text-decoration: none; }
   .meta a:hover { text-decoration: underline; }
   .check { font-size: .78rem; color: var(--muted); font-style: italic; margin-top: .45rem; }
+  .tag-time {
+    font-size: .72rem; color: var(--muted); background: #0b0f18;
+    border: 1px solid var(--border); padding: .1rem .5rem; border-radius: 999px;
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .tag-lvl { font-size: .7rem; font-weight: 700; padding: .15rem .55rem; border-radius: 999px; white-space: nowrap; flex-shrink: 0; }
+  .lvl-1 { background: #1e3a5f; color: #7db4ff; }
+  .lvl-2 { background: rgba(255,184,79,.14); color: var(--prog); }
+  .lvl-3 { background: rgba(255,120,120,.12); color: #ff9a9a; }
+  .blk-h { font-size: .78rem; color: var(--muted); letter-spacing: 0; text-transform: none; white-space: nowrap; }
   b[contenteditable] {
     color: var(--text); font-weight: 600; border-bottom: 1px dashed var(--border);
     cursor: text; outline: none; min-width: 1.5em; display: inline-block;
@@ -312,6 +322,27 @@
 
     var blocks = document.querySelectorAll('section.block');
     var toc = document.getElementById('toc');
+    var LVL = ['Básico', 'Medio', 'Avanzado'];
+    var META = {
+      'b01-1': {h:2, l:1}, 'b01-2': {h:2, l:1}, 'b01-3': {h:2, l:1}, 'b01-4': {h:1, l:1}, 'b01-5': {h:1, l:1},
+      'b02-1': {h:5, l:2}, 'b02-2': {h:2, l:1}, 'b02-3': {h:5, l:2}, 'b02-4': {h:3, l:1}, 'b02-5': {h:3, l:1},
+      'b03-1': {h:3, l:1}, 'b03-2': {h:2, l:2}, 'b03-3': {h:3, l:2}, 'b03-4': {h:2, l:2}, 'b03-5': {h:2, l:1},
+      'b04-1': {h:5, l:2}, 'b04-2': {h:2, l:2}, 'b04-3': {h:3, l:2}, 'b04-4': {h:3, l:3}, 'b04-5': {h:3, l:3}, 'b04-6': {h:2, l:3}, 'b04-7': {h:2, l:2}, 'b04-8': {h:4, l:3}, 'b04-9': {h:2, l:2},
+      'b05-1': {h:4, l:2}, 'b05-2': {h:2, l:2}, 'b05-3': {h:3, l:2}, 'b05-4': {h:3, l:3}, 'b05-5': {h:2, l:2},
+      'b06-1': {h:3, l:1}, 'b06-2': {h:2, l:2}, 'b06-3': {h:2, l:2}, 'b06-4': {h:2, l:3}, 'b06-5': {h:2, l:1}, 'b06-6': {h:1, l:1},
+      'b07-1': {h:4, l:2}, 'b07-2': {h:1, l:1}, 'b07-3': {h:2, l:3}, 'b07-4': {h:2, l:2}, 'b07-5': {h:2, l:2}, 'b07-6': {h:1, l:1}, 'b07-7': {h:3, l:2}, 'b07-8': {h:2, l:1},
+      'b08-1': {h:5, l:2}, 'b08-2': {h:2, l:2}, 'b08-3': {h:5, l:3}, 'b08-4': {h:4, l:3}, 'b08-5': {h:3, l:3}, 'b08-6': {h:3, l:2}, 'b08-7': {h:3, l:1}, 'b08-8': {h:2, l:1},
+      'b09-1': {h:4, l:2}, 'b09-2': {h:2, l:2}, 'b09-3': {h:2, l:3}, 'b09-4': {h:1, l:1},
+      'b10-1': {h:3, l:2}, 'b10-2': {h:4, l:2}, 'b10-3': {h:2, l:2}, 'b10-4': {h:1, l:2}, 'b10-5': {h:2, l:2},
+      'b11-1': {h:2, l:1}, 'b11-2': {h:2, l:2}, 'b11-3': {h:2, l:2}, 'b11-4': {h:3, l:3}, 'b11-5': {h:2, l:2},
+      'b12-1': {h:3, l:2}, 'b12-2': {h:2, l:1}, 'b12-3': {h:4, l:3}, 'b12-4': {h:1, l:2},
+      'b13-1': {h:2, l:2}, 'b13-2': {h:2, l:2}, 'b13-3': {h:2, l:2}, 'b13-4': {h:2, l:1}, 'b13-5': {h:1, l:1},
+      'b14-1': {h:3, l:2}, 'b14-2': {h:3, l:2}, 'b14-3': {h:3, l:3}, 'b14-4': {h:2, l:2}, 'b14-5': {h:2, l:2}, 'b14-6': {h:3, l:3}, 'b14-7': {h:3, l:2}, 'b14-8': {h:3, l:3}, 'b14-9': {h:2, l:1},
+      'b15-1': {h:2, l:1}, 'b15-2': {h:1, l:1}, 'b15-3': {h:2, l:1}, 'b15-4': {h:1, l:1}, 'b15-5': {h:2, l:2}, 'b15-6': {h:2, l:2}, 'b15-7': {h:3, l:2}, 'b15-8': {h:3, l:2}, 'b15-9': {h:4, l:3}, 'b15-10': {h:2, l:2}, 'b15-11': {h:4, l:3},
+      'b16-1': {h:3, l:2}, 'b16-2': {h:1, l:2}, 'b16-3': {h:2, l:2}, 'b16-4': {h:2, l:2}, 'b16-5': {h:4, l:3}
+    };
+    var TOTAL_H = 0;
+    Object.keys(META).forEach(function (k) { TOTAL_H += META[k].h; });
     var CHECK = {
       14: '¿Lo dominas? Resuélvelo sin ayuda y explica la causa en inglés.',
       15: '¿Lo dominas? Ejecútalo en consola sin ayuda y explica cada paso en inglés.',
@@ -353,9 +384,23 @@
     blocks.forEach(function (b) {
       var n = parseInt(b.id.slice(1), 10);
       var items = b.querySelectorAll('.item');
+      var blockH = 0;
       items.forEach(function (it, idx) {
         var id = b.id + '-' + (idx + 1);
         it.dataset.id = id;
+        var m = META[id];
+        if (m) {
+          blockH += m.h;
+          var t = document.createElement('span');
+          t.className = 'tag-time';
+          t.textContent = m.h + ' h';
+          var l = document.createElement('span');
+          l.className = 'tag-lvl lvl-' + m.l;
+          l.textContent = LVL[m.l - 1];
+          var nm = it.querySelector('.name');
+          nm.parentNode.insertBefore(t, nm.nextSibling);
+          nm.parentNode.insertBefore(l, t.nextSibling);
+        }
         var s = store[id];
         var ck = it.querySelector('.ck');
         var dEl = it.querySelector('[data-k="d"]');
@@ -375,6 +420,10 @@
       a.href = '#' + b.id;
       a.innerHTML = '<b>' + n + '</b> ' + b.querySelector('.ttl').textContent;
       toc.appendChild(a);
+      var bh = document.createElement('span');
+      bh.className = 'blk-h';
+      bh.textContent = '· ' + blockH + ' h';
+      b.querySelector('.blk-pct').parentNode.appendChild(bh);
     });
 
     function render() {
@@ -397,7 +446,7 @@
       var scoreT = (total.dom + total.prog * 0.5) / nT * 100;
       document.getElementById('bar-total').style.width = scoreT.toFixed(0) + '%';
       document.getElementById('counts-total').textContent =
-        total.dom + ' dominados · ' + total.prog + ' en progreso · ' + total.pend + ' pendientes · ' + scoreT.toFixed(0) + '% del plan';
+        total.dom + ' dominados · ' + total.prog + ' en progreso · ' + total.pend + ' pendientes · ' + scoreT.toFixed(0) + '% del plan · ' + TOTAL_H + ' h estimadas';
     }
 
     document.addEventListener('change', function (e) {

@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GCP — Control de temas</title>
+<!--
+  CÓMO EDITAR ESTA PÁGINA (estática, a mano):
+  1. Estado de un tema: cambiar la clase del <div class="item ...">:
+       pend  = Pendiente (gris)
+       prog  = En progreso (ámbar)  -> teoría vista o quiz hecho, falta algo
+       dom   = Dominado (verde)     -> solo con quiz + práctica/laboratorio completados
+  2. Fecha, resultado y enlace: editar los <span>/<a> dentro de .meta de cada tema.
+  3. Los contadores y barras de progreso se calculan solos al abrir la página.
+-->
+<style>
+  :root {
+    --bg: #0f1420; --card: #171e2e; --text: #e8ecf4; --muted: #9aa5b8;
+    --accent: #4f8cff; --border: #2a3448;
+    --pend: #55607a; --prog: #ffb84f; --dom: #7fd99b;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg); color: var(--text);
+    padding: 2rem 1rem 4rem; line-height: 1.45;
+  }
+  .wrap { max-width: 860px; margin: 0 auto; }
+  h1 { font-size: 1.5rem; margin-bottom: .25rem; }
+  .sub { color: var(--muted); margin-bottom: 1.25rem; font-size: .92rem; }
+  .sub a { color: var(--accent); text-decoration: none; }
+
+  .summary {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; padding: .9rem 1.1rem; margin-bottom: 1.5rem;
+  }
+  .bar-outer { background: #0b0f18; border-radius: 999px; height: 10px; overflow: hidden; margin: .55rem 0 .4rem; }
+  .bar-inner { height: 100%; width: 0; background: linear-gradient(90deg, var(--accent), var(--dom)); transition: width .3s; }
+  .summary .counts { font-size: .85rem; color: var(--muted); }
+
+  .legend { display: flex; flex-wrap: wrap; gap: .6rem; margin: 0 0 1.5rem; font-size: .8rem; color: var(--muted); }
+  .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: .3rem; vertical-align: -1px; }
+  .dot.pend { background: var(--pend); } .dot.prog { background: var(--prog); } .dot.dom { background: var(--dom); }
+
+  nav.toc {
+    background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+    padding: .8rem 1rem; margin-bottom: 1.5rem;
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: .3rem .9rem;
+    font-size: .85rem;
+  }
+  nav.toc a { color: var(--text); text-decoration: none; padding: .15rem 0; }
+  nav.toc a:hover { color: var(--accent); }
+  nav.toc a b { color: var(--accent); }
+
+  section.block { margin-bottom: 2rem; }
+  h2 {
+    font-size: 1rem; text-transform: uppercase; letter-spacing: .07em;
+    color: var(--muted); border-bottom: 1px solid var(--border);
+    padding-bottom: .4rem; margin-bottom: .6rem;
+    display: flex; align-items: baseline; gap: .6rem; flex-wrap: wrap;
+  }
+  h2 .blk-bar { flex: 1; min-width: 90px; height: 6px; background: #0b0f18; border-radius: 999px; overflow: hidden; }
+  h2 .blk-bar i { display: block; height: 100%; width: 0; background: var(--accent); }
+  h2 .blk-pct { font-size: .78rem; color: var(--muted); letter-spacing: 0; text-transform: none; }
+
+  .item {
+    background: var(--card); border: 1px solid var(--border); border-left: 3px solid var(--pend);
+    border-radius: 8px; padding: .6rem .85rem; margin-bottom: .45rem;
+    display: grid; grid-template-columns: 88px 1fr; gap: .2rem .85rem;
+  }
+  .item.prog { border-left-color: var(--prog); }
+  .item.dom  { border-left-color: var(--dom); }
+  .st {
+    grid-row: span 2; align-self: start; margin-top: .15rem;
+    font-size: .7rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+    padding: .22rem .5rem; border-radius: 999px; text-align: center; white-space: nowrap;
+  }
+  .item.pend .st { background: rgba(85,96,122,.25); color: #aeb8cc; }
+  .item.prog .st { background: rgba(255,184,79,.15); color: var(--prog); }
+  .item.dom  .st { background: rgba(127,217,155,.14); color: var(--dom); }
+  .name { font-size: .92rem; font-weight: 600; }
+  .desc { font-size: .82rem; color: var(--muted); }
+  .meta {
+    grid-column: 2; display: flex; flex-wrap: wrap; gap: .35rem .9rem;
+    font-size: .78rem; color: var(--muted); margin-top: .15rem;
+  }
+  .meta a { color: var(--accent); text-decoration: none; }
+  .meta a:hover { text-decoration: underline; }
+
+  .foot { margin-top: 2.5rem; color: var(--muted); font-size: .82rem; border-top: 1px solid var(--border); padding-top: .8rem; }
+
+  @media (max-width: 600px) {
+    .item { grid-template-columns: 78px 1fr; }
+    .meta { grid-column: 1 / -1; padding-left: 0; }
+    h1 { font-size: 1.3rem; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Google Cloud — Control de temas</h1>
+  <p class="sub">Preparación GCP Cloud Support Engineer · TELUS (tentativa feb–mar 2027) · Actualizado: 04 oct 2026 · <a href="#como-editar">¿Cómo editar?</a></p>
+
+  <div class="summary">
+    <strong style="font-size:.95rem;">Avance general</strong>
+    <div class="bar-outer"><div class="bar-inner" id="bar-total"></div></div>
+    <div class="counts" id="counts-total"></div>
+  </div>
+
+  <div class="legend">
+    <span><span class="dot pend"></span>Pendiente</span>
+    <span><span class="dot prog"></span>En progreso</span>
+    <span><span class="dot dom"></span>Dominado (quiz + práctica)</span>
+  </div>
+
+  <nav class="toc" id="toc"></nav>
+
+  <section class="block" id="b01">
+    <h2>1 · Fundamentos de Google Cloud <span class="blk-bar"><i></i></span><span class="blk-pct"></span></h2>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Cloud computing, responsabilidad compartida, regiones y zonas</span><span class="desc">Qué es usar la nube, qué protege Google y qué protege el cliente, y cómo se organizan sus centros de datos.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Projects, folders, organizations, APIs y Service Usage</span><span class="desc">La jerarquía para ordenar recursos, permisos y facturación, y cómo se activan servicios por proyecto.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Google Cloud Console, Cloud Shell, gcloud y documentación</span><span class="desc">Las tres formas de administrar GCP —página web, terminal del navegador y comandos— y dónde buscar ayuda.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Labels, quotas, limits y resource locations</span><span class="desc">Etiquetas para organizar recursos, topes de consumo por región y dónde vive cada recurso.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Billing accounts, budgets, alerts y control de costos</span><span class="desc">Cómo se paga la nube, cómo fijar presupuestos y recibir avisos antes de gastar de más.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+  </section>
+
+  <section class="block" id="b02">
+    <h2>2 · Linux, redes y programación base <span class="blk-bar"><i></i></span><span class="blk-pct"></span></h2>
+    <div class="item prog"><span class="st">En progreso</span><span class="name">Linux CLI, permisos, procesos, servicios, usuarios y logs</span><span class="desc">Manejo del sistema desde la terminal: archivos, permisos, procesos y registros de actividad.</span><div class="meta"><span>Fecha: 31 jul 2026</span><span>Resultado: Quiz 8/10</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Bash, pipes, redirección y herramientas de diagnóstico</span><span class="desc">Encadenar comandos y llevar salidas a archivos para investigar problemas.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">OSI, TCP/IP, IPv4, CIDR, subnetting, DNS, DHCP, NAT y puertos</span><span class="desc">El modelo de capas de red y cómo las direcciones IP y los nombres se traducen entre sí.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">HTTP/HTTPS, TLS, REST, JSON, status codes y curl</span><span class="desc">Cómo hablan las aplicaciones por internet: peticiones, respuestas, cifrado y pruebas con curl.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Git y Python básico para scripts de soporte</span><span class="desc">Control de versiones para código y scripts sencillos para automatizar tareas de soporte.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+  </section>
+
+  <section class="block" id="b03">
+    <h2>3 · IAM y administración de recursos <span class="blk-bar"><i></i></span><span class="blk-pct"></span></h2>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Principals, groups, roles básicos, predefinidos y custom</span><span class="desc">Quién puede hacer qué: usuarios, grupos y conjuntos de permisos según el rol.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">IAM policies, herencia, condiciones y least privilege</span><span class="desc">Cómo se asignan permisos, cómo se heredan y por qué conviene dar solo lo mínimo.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Service accounts, impersonation, Workload Identity y rotación</span><span class="desc">Identidades para máquinas y programas, sin contraseñas fijas y con rotación segura.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Organization policies, Resource Manager y audit logs</span><span class="desc">Reglas que aplican a toda la organización y cómo auditar quién hizo qué.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">API keys, OAuth y service account keys permanentes</span><span class="desc">Formas de autenticar programas y por qué evitar claves de servicio que nunca caducan.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+  </section>
+
+  <section class="block" id="b04">
+    <h2>4 · Networking GCP <span class="blk-bar"><i></i></span><span class="blk-pct"></span></h2>
+    <div class="item prog"><span class="st">En progreso</span><span class="name">VPC global, subnets regionales, rangos IP, rutas y peering</span><span class="desc">La red privada virtual de GCP: cómo se divide, por dónde viaja el tráfico y cómo se conecta con otras redes.</span><div class="meta"><span>Fecha: 01 oct 2026</span><span>Resultado: Teoría vista · quiz y lab pendientes</span><span>Enlace: <a href="sesion-vpc-movil.md">guía VPC</a></span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Auto mode vs custom mode y Shared VPC</span><span class="desc">Dos formas de crear subredes —automáticas o manuales— y redes compartidas entre proyectos.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Firewall rules, hierarchical firewall, tags y service accounts</span><span class="desc">Reglas que permiten o bloquean tráfico según etiquetas o identidades.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Cloud NAT, Cloud Router y BGP</span><span class="desc">Salida a internet sin IP pública y enrutamiento dinámico entre redes.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Cloud VPN, Cloud Interconnect y Private Google Access</span><span class="desc">Túneles y enlaces directos para conectar GCP con una red propia, o acceder a Google sin salir a internet.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Private Service Connect y VPC Service Controls</span><span class="desc">Conectar servicios de forma privada y limitar qué datos pueden salir de la organización.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Cloud DNS, Network Connectivity Center y Connectivity Tests</span><span class="desc">Nombres de dominio internos, administrar varias redes desde un solo punto y probar rutas de red.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Load Balancing: external, internal, proxy y passthrough</span><span class="desc">Repartir tráfico entre máquinas, hacia afuera o hacia adentro, de forma global o regional.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Cloud CDN y Cloud Armor</span><span class="desc">Acelerar contenido web y bloquear ataques antes de que lleguen a los servidores.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+  </section>
+
+  <section class="block" id="b05">
+    <h2>5 · Compute <span class="blk-bar"><i></i></span><span class="blk-pct"></span></h2>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Compute Engine: tipos de máquina, imágenes, discos y ciclo de vida</span><span class="desc">Las máquinas virtuales: tamaños disponibles, sistemas operativos y estados por los que pasan.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Persistent Disk, Local SSD, snapshots, images y backups</span><span class="desc">Discos duraderos frente a discos rápidos, y copias para recuperar información.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">SSH, OS Login, IAP, metadata y startup scripts</span><span class="desc">Formas seguras de entrar a las VMs y configurarlas automáticamente al arrancar.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Managed Instance Groups, instance templates y autoscaling</span><span class="desc">Grupos de VMs idénticas que crecen o se encogen según la carga de trabajo.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Health checks, failover y troubleshooting de VMs</span><span class="desc">Detectar máquinas caídas, redirigir el tráfico y diagnosticar fallas.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+  </section>
+
+  <section class="block" id="b06">
+    <h2>6 · Storage <span class="blk-bar"><i></i></span><span class="blk-pct"></span></h2>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Cloud Storage: buckets, objetos, ubicaciones y clases</span><span class="desc">Archivos en la nube: contenedores, dónde se guardan y precios según la frecuencia de uso.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">IAM, uniform bucket-level access, ACLs y signed URLs</span><span class="desc">Controlar quién accede a qué y crear enlaces temporales para descargas.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Versioning, lifecycle, retention policies, holds y soft delete</span><span class="desc">Historial de versiones, reglas automáticas y protecciones contra borrados accidentales.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Cifrado Google-managed y CMEK con Cloud KMS</span><span class="desc">Datos cifrados por Google o con llaves que administra el propio cliente.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Subidas, descargas, permisos, transferencia y troubleshooting</span><span class="desc">Operaciones cotidianas y los errores típicos al usarlas.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Filestore y diferencias entre object, block y file storage</span><span class="desc">Sistemas de archivos compartidos y cuándo conviene cada tipo de almacenamiento.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+  </section>
+
+  <section class="block" id="b07">
+    <h2>7 · Bases de datos y datos <span class="blk-bar"><i></i></span><span class="blk-pct"></span></h2>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Cloud SQL: engines, conexiones, backups, HA, réplicas y maintenance</span><span class="desc">Bases SQL administradas —MySQL, PostgreSQL— con copias, alta disponibilidad y mantenimiento.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">AlloyDB: concepto y casos de uso</span><span class="desc">PostgreSQL más rápido, pensado para cargas analíticas pesadas.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Cloud Spanner: escala global y consistencia</span><span class="desc">SQL que escala a nivel mundial sin perder consistencia en los datos.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Firestore: documentos, colecciones, indexes y reglas</span><span class="desc">Base NoSQL de documentos para aplicaciones con datos en tiempo real.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Bigtable: wide-column, row keys y escala</span><span class="desc">Base NoSQL de columnas anchas para datos masivos con respuestas muy rápidas.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Memorystore: cache Redis/Memcached</span><span class="desc">Caché en memoria para acelerar las respuestas de una aplicación.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">BigQuery: datasets, tables, queries, permisos y costos</span><span class="desc">Almacén de datos para análisis, con consultas rápidas y control de gasto.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Diferencias entre SQL, NoSQL, object storage, cache y warehouse</span><span class="desc">Saber elegir la herramienta correcta según el tipo de dato y el caso de uso.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+  </section>
+
+  <section class="block" id="b08">
+    <h2>8 · Containers y serverless <span class="blk-bar"><i></i></span><span class="blk-pct"></span></h2>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Docker: imágenes, Dockerfile, registry, docker run y Compose</span><span class="desc">Empaquetar aplicaciones con todo lo necesario para que corran igual en cualquier lado.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Artifact Registry y vulnerabilidades de imágenes</span><span class="desc">Guardar imágenes de contenedores y detectar fallas de seguridad dentro de ellas.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">GKE: clusters, nodes, pools, pods, deployments y services</span><span class="desc">Kubernetes administrado por Google: la estructura básica de un clúster.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">GKE: ingress/gateway, ConfigMaps, Secrets, RBAC y autoscaling</span><span class="desc">Exponer servicios, configurar sin recompilar, guardar secretos y controlar permisos.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Kubernetes logs, events, probes, rollout y rollback</span><span class="desc">Diagnóstico de fallas y despliegues que se pueden revertir sin drama.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Cloud Run: revision, traffic, concurrency, regions y service account</span><span class="desc">Ejecutar contenedores sin administrar servidores; se paga solo por el uso.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Cloud Functions: triggers, runtime, permisos, logs y deploy</span><span class="desc">Código corto que se ejecuta ante un evento, como un archivo subido o una petición.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">App Engine: services, versions, scaling y traffic migration</span><span class="desc">Desplegar aplicaciones completas sin tocar infraestructura.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+  </section>
+
+  <section class="block" id="b09">
+    <h2>9 · Integración y aplicaciones <span class="blk-bar"><i></i></span><span class="blk-pct"></span></h2>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Pub/Sub: topics, subscriptions, acknowledgements, retry y dead-letter</span><span class="desc">Cola de mensajes entre servicios: publicar, suscribirse, confirmar, reintentar y manejar fallos.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Eventarc, Cloud Scheduler y Workflows</span><span class="desc">Disparar tareas por eventos, por horario o encadenando varios pasos.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">API Gateway y conceptos básicos de Apigee</span><span class="desc">Publicar y proteger APIs detrás de un punto de entrada controlado.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Cloud Tasks y patrones asíncronos</span><span class="desc">Encargar trabajos en segundo plano sin hacer esperar al usuario.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+  </section>
+
+  <section class="block" id="b10">
+    <h2>10 · Observabilidad y operaciones <span class="blk-bar"><i></i></span><span class="blk-pct"></span></h2>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Cloud Logging, Log Explorer, sinks, exclusions y log-based metrics</span><span class="desc">Todos los registros del sistema en un solo lugar, filtrables y exportables.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Cloud Monitoring, dashboards, alert policies, uptime checks y SLOs</span><span class="desc">Gráficas de salud del sistema y avisos automáticos cuando algo se sale de lo normal.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Error Reporting, Cloud Trace y Cloud Profiler</span><span class="desc">Encontrar errores, medir tiempos de respuesta y detectar cuellos de botella.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Ops Agent, métricas de VM y auditoría de actividad</span><span class="desc">El agente que recoge datos del sistema y el registro de quién hizo qué en la cuenta.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Incidentes: severidad, timeline, evidencia y escalamiento</span><span class="desc">Cómo reaccionar de forma ordenada ante un problema en producción.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+  </section>
+
+  <section class="block" id="b11">
+    <h2>11 · Seguridad <span class="blk-bar"><i></i></span><span class="blk-pct"></span></h2>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Shared responsibility, least privilege y defense in depth</span><span class="desc">Principios básicos: repartir responsabilidad, dar lo mínimo y poner varias capas.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Secret Manager y Cloud KMS</span><span class="desc">Guardar contraseñas y llaves de cifrado sin dejarlas expuestas en el código.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Security Command Center y vulnerabilidades</span><span class="desc">Panel central para detectar vulnerabilidades y amenazas en los recursos.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">VPC Service Controls, Cloud Armor y Binary Authorization</span><span class="desc">Perímetros de seguridad, protección web y permitir solo código firmado.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">IAM audit, policy troubleshooter y acceso temporal</span><span class="desc">Revisar permisos, descubrir por qué algo falla y dar accesos con fecha de caducidad.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+  </section>
+
+  <section class="block" id="b12">
+    <h2>12 · DevOps e infraestructura <span class="blk-bar"><i></i></span><span class="blk-pct"></span></h2>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Cloud Build, Artifact Registry y Cloud Deploy</span><span class="desc">Compilar, guardar y publicar aplicaciones de forma automática.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">CI/CD, ramas, pull requests y rollback</span><span class="desc">El flujo para publicar cambios rápido y volver atrás sin drama cuando algo sale mal.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Terraform: provider, state, plan, apply y variables</span><span class="desc">Escribir la infraestructura como código: planificar y aplicar cambios de forma repetible.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Infraestructura reproducible y configuración por ambientes</span><span class="desc">Que desarrollo y producción se creen iguales, sin pasos manuales.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+  </section>
+
+  <section class="block" id="b13">
+    <h2>13 · Fiabilidad, rendimiento y costos <span class="blk-bar"><i></i></span><span class="blk-pct"></span></h2>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Alta disponibilidad, redundancia zonal/regional y disaster recovery</span><span class="desc">Diseñar para que el servicio siga vivo aunque falle una zona o una región.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">RTO, RPO, backups, réplicas y restauración</span><span class="desc">Cuánto tiempo y cuántos datos se pueden perder, y cómo recuperarse.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Quotas, rate limits, capacity y performance</span><span class="desc">Topes de consumo y planificación de capacidad antes de que falte.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Budgets, billing reports, rightsizing, autoscaling y cleanup</span><span class="desc">Controlar el gasto, ajustar tamaños de máquinas y borrar lo que ya no se usa.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Trade-offs entre costo, latencia, disponibilidad y seguridad</span><span class="desc">Saber equilibrar lo que no se puede tener todo al mismo tiempo.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+  </section>
+
+  <section class="block" id="b14">
+    <h2>14 · Troubleshooting que debe poder resolver <span class="blk-bar"><i></i></span><span class="blk-pct"></span></h2>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">VM inaccesible por SSH o sin conectividad</span><span class="desc">Entrar a una máquina caída o aislada para devolverla a la vida.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Firewall bloqueando ingress o egress</span><span class="desc">Encontrar la regla que corta el tráfico y corregirla sin abrir de más.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">DNS, rutas, NAT, peering o VPN fallando</span><span class="desc">Cuando la red no resuelve nombres ni rutas, saber dónde mirar primero.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">VM con CPU, memoria o disco saturado</span><span class="desc">Identificar qué consume todo el recurso y aliviarlo con evidencia.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Bucket con 403, 404, upload fallido o lifecycle incorrecto</span><span class="desc">Los errores típicos de Cloud Storage y qué los causa.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Cloud SQL sin conexión, permisos, backup o réplica</span><span class="desc">Bases administradas que no responden: la ruta de diagnóstico paso a paso.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Cloud Run o Cloud Functions con deploy fallido, timeout o 5xx</span><span class="desc">Problemas comunes de serverless y cómo leerlos en los logs.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">GKE con pods Pending, CrashLoopBackOff, probes o service sin tráfico</span><span class="desc">Los síntomas clásicos de Kubernetes y su remedio.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">API deshabilitada, quota agotada, billing suspendido o IAM incorrecto</span><span class="desc">Cuando nada funciona por un permiso, un tope o una factura.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+  </section>
+
+  <section class="block" id="b15">
+    <h2>15 · Laboratorios obligatorios <span class="blk-bar"><i></i></span><span class="blk-pct"></span></h2>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Lab 1 — Crear una VPC custom con dos subnets</span><span class="desc">Practicar subredes pública y privada desde cero.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Lab 2 — Restringir SSH a la IP propia con una firewall rule</span><span class="desc">La regla de seguridad correcta antes de exponer cualquier máquina.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Lab 3 — Lanzar una VM, conectarse por SSH e instalar nginx</span><span class="desc">Primera máquina virtual sirviendo una página web.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Lab 4 — Crear snapshot y restaurar una VM</span><span class="desc">Respaldar y recuperar una máquina completa.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Lab 5 — Crear bucket, aplicar IAM, lifecycle y versioning</span><span class="desc">Almacenamiento con permisos y reglas automáticas.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Lab 6 — Crear una instancia de Cloud SQL y probar una conexión</span><span class="desc">Crear una base administrada y conectarse a ella.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Lab 7 — Desplegar una Cloud Function y un servicio Cloud Run</span><span class="desc">Primer despliegue serverless real.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Lab 8 — Crear una imagen Docker y subirla a Artifact Registry</span><span class="desc">Construir y publicar un contenedor propio.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Lab 9 — Crear un deployment y service básicos en GKE</span><span class="desc">Kubernetes básico en la práctica.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Lab 10 — Crear logs, métricas y una alerta</span><span class="desc">Observabilidad mínima para una aplicación real.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Lab 11 — Resolver escenarios de troubleshooting con evidencia</span><span class="desc">Resolver un escenario roto y documentar el proceso completo.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+  </section>
+
+  <section class="block" id="b16">
+    <h2>16 · Entrevista y soporte <span class="blk-bar"><i></i></span><span class="blk-pct"></span></h2>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Explicar conceptos técnicos en inglés sencillo</span><span class="desc">Decir lo técnico sin trabas, en palabras simples.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Hacer preguntas de clarificación y delimitar el impacto</span><span class="desc">Entender bien el problema antes de proponer soluciones.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Reproducir, revisar logs, proponer mitigación y documentar</span><span class="desc">El método de soporte: reproducir, investigar, mitigar y dejar evidencia.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Distinguir causa, síntoma, workaround y solución permanente</span><span class="desc">Separar lo que se ve, lo que lo produce y el arreglo definitivo.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+    <div class="item pend"><span class="st">Pendiente</span><span class="name">Practicar preguntas orales, escenarios GCP y prueba en vivo</span><span class="desc">Simulacros tipo entrevista técnica real.</span><div class="meta"><span>Fecha: —</span><span>Resultado: —</span><span>Enlace: —</span></div></div>
+  </section>
+
+  <div class="foot" id="como-editar">
+    <strong>Cómo editar esta página</strong> (estática, se edita a mano):<br>
+    1. <b>Estado:</b> cambiar la clase del tema — <code>pend</code> (gris), <code>prog</code> (ámbar) o <code>dom</code> (verde).<br>
+    2. <b>Dominado</b> solo se marca con quiz y práctica/laboratorio completados.<br>
+    3. <b>Fecha, resultado y enlace:</b> editar los textos dentro de la línea <code>meta</code> de cada tema.<br>
+    4. Los contadores y barras de progreso se actualizan solos al abrir la página.
+  </div>
+</div>
+
+<script>
+  (function () {
+    var blocks = document.querySelectorAll('section.block');
+    var total = { pend: 0, prog: 0, dom: 0 };
+    var toc = document.getElementById('toc');
+    blocks.forEach(function (b) {
+      var items = b.querySelectorAll('.item');
+      var c = { pend: 0, prog: 0, dom: 0 };
+      items.forEach(function (it) {
+        if (it.classList.contains('prog')) c.prog++;
+        else if (it.classList.contains('dom')) c.dom++;
+        else c.pend++;
+      });
+      total.pend += c.pend; total.prog += c.prog; total.dom += c.dom;
+      var n = items.length;
+      var score = (c.dom + c.prog * 0.5) / n * 100;
+      b.querySelector('.blk-bar i').style.width = score.toFixed(0) + '%';
+      b.querySelector('.blk-pct').textContent = c.dom + '/' + n + ' dominados';
+      var a = document.createElement('a');
+      a.href = '#' + b.id;
+      a.innerHTML = '<b>' + b.id.slice(1) + '</b> ' + b.querySelector('h2').childNodes[0].textContent.split('·')[1].trim();
+      toc.appendChild(a);
+    });
+    var nT = total.pend + total.prog + total.dom;
+    var scoreT = (total.dom + total.prog * 0.5) / nT * 100;
+    document.getElementById('bar-total').style.width = scoreT.toFixed(0) + '%';
+    document.getElementById('counts-total').textContent =
+      total.dom + ' dominados · ' + total.prog + ' en progreso · ' + total.pend + ' pendientes · ' + scoreT.toFixed(0) + '% del plan';
+  })();
+</script>
+</body>
+</html>

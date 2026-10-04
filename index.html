@@ -53,6 +53,11 @@
   nav.toc a b { color: var(--accent); font-weight: 700; }
 
   section.block { margin-bottom: 1.6rem; }
+  section.suggestions {
+    margin-top: 2.2rem; padding-top: 1rem;
+    border-top: 1px solid var(--border);
+  }
+  .suggestion-intro { color: var(--muted); font-size: .8rem; margin: -.2rem 0 .6rem; }
   h2 {
     font-size: .8rem; font-weight: 600; text-transform: uppercase; letter-spacing: .06em;
     color: var(--muted); border-bottom: 1px solid var(--border);
@@ -282,7 +287,8 @@
     <details class="item pend"><summary><label class="ckbox"><input type="checkbox" class="ck" aria-label="Dominado"><span class="box"></span></label><span class="st">Pendiente</span><span class="name">API deshabilitada, quota agotada, billing suspendido o IAM incorrecto</span></summary><div class="body"><span class="desc">Cuando nada funciona por un permiso, un tope o una factura.</span><div class="meta"><span>Fecha: <b contenteditable="true" data-k="d">—</b></span><span>Resultado: <b contenteditable="true" data-k="r">—</b></span><span>Enlace: —</span></div></div></details>
   </section>
 
-  <section class="block" id="b15"><h2><span class="num">15</span><span class="ttl">Laboratorios obligatorios</span><span class="blk-bar"><i></i></span><span class="blk-pct"></span></h2>
+  <section class="suggestions" id="labs"><h2><span class="num">+</span><span class="ttl">Sugerencias de laboratorios</span><span class="blk-bar"><i></i></span><span class="blk-pct"></span></h2>
+    <p class="suggestion-intro">Prácticas opcionales para reforzar los temas. No cuentan en el avance principal.</p>
     <details class="item pend"><summary><label class="ckbox"><input type="checkbox" class="ck" aria-label="Dominado"><span class="box"></span></label><span class="st">Pendiente</span><span class="name">Lab 1 — Crear una VPC custom con dos subnets</span></summary><div class="body"><span class="desc">Practicar subredes pública y privada desde cero.</span><div class="meta"><span>Fecha: <b contenteditable="true" data-k="d">—</b></span><span>Resultado: <b contenteditable="true" data-k="r">—</b></span><span>Enlace: —</span></div></div></details>
     <details class="item pend"><summary><label class="ckbox"><input type="checkbox" class="ck" aria-label="Dominado"><span class="box"></span></label><span class="st">Pendiente</span><span class="name">Lab 2 — Restringir SSH a la IP propia con una firewall rule</span></summary><div class="body"><span class="desc">La regla de seguridad correcta antes de exponer cualquier máquina.</span><div class="meta"><span>Fecha: <b contenteditable="true" data-k="d">—</b></span><span>Resultado: <b contenteditable="true" data-k="r">—</b></span><span>Enlace: —</span></div></div></details>
     <details class="item pend"><summary><label class="ckbox"><input type="checkbox" class="ck" aria-label="Dominado"><span class="box"></span></label><span class="st">Pendiente</span><span class="name">Lab 3 — Lanzar una VM, conectarse por SSH e instalar nginx</span></summary><div class="body"><span class="desc">Primera máquina virtual sirviendo una página web.</span><div class="meta"><span>Fecha: <b contenteditable="true" data-k="d">—</b></span><span>Resultado: <b contenteditable="true" data-k="r">—</b></span><span>Enlace: —</span></div></div></details>
@@ -294,14 +300,6 @@
     <details class="item pend"><summary><label class="ckbox"><input type="checkbox" class="ck" aria-label="Dominado"><span class="box"></span></label><span class="st">Pendiente</span><span class="name">Lab 9 — Crear un deployment y service básicos en GKE</span></summary><div class="body"><span class="desc">Kubernetes básico en la práctica.</span><div class="meta"><span>Fecha: <b contenteditable="true" data-k="d">—</b></span><span>Resultado: <b contenteditable="true" data-k="r">—</b></span><span>Enlace: —</span></div></div></details>
     <details class="item pend"><summary><label class="ckbox"><input type="checkbox" class="ck" aria-label="Dominado"><span class="box"></span></label><span class="st">Pendiente</span><span class="name">Lab 10 — Crear logs, métricas y una alerta</span></summary><div class="body"><span class="desc">Observabilidad mínima para una aplicación real.</span><div class="meta"><span>Fecha: <b contenteditable="true" data-k="d">—</b></span><span>Resultado: <b contenteditable="true" data-k="r">—</b></span><span>Enlace: —</span></div></div></details>
     <details class="item pend"><summary><label class="ckbox"><input type="checkbox" class="ck" aria-label="Dominado"><span class="box"></span></label><span class="st">Pendiente</span><span class="name">Lab 11 — Resolver escenarios de troubleshooting con evidencia</span></summary><div class="body"><span class="desc">Resolver un escenario roto y documentar el proceso completo.</span><div class="meta"><span>Fecha: <b contenteditable="true" data-k="d">—</b></span><span>Resultado: <b contenteditable="true" data-k="r">—</b></span><span>Enlace: —</span></div></div></details>
-  </section>
-
-  <section class="block" id="b16"><h2><span class="num">16</span><span class="ttl">Entrevista y soporte</span><span class="blk-bar"><i></i></span><span class="blk-pct"></span></h2>
-    <details class="item pend"><summary><label class="ckbox"><input type="checkbox" class="ck" aria-label="Dominado"><span class="box"></span></label><span class="st">Pendiente</span><span class="name">Explicar conceptos técnicos en inglés sencillo</span></summary><div class="body"><span class="desc">Decir lo técnico sin trabas, en palabras simples.</span><div class="meta"><span>Fecha: <b contenteditable="true" data-k="d">—</b></span><span>Resultado: <b contenteditable="true" data-k="r">—</b></span><span>Enlace: —</span></div></div></details>
-    <details class="item pend"><summary><label class="ckbox"><input type="checkbox" class="ck" aria-label="Dominado"><span class="box"></span></label><span class="st">Pendiente</span><span class="name">Hacer preguntas de clarificación y delimitar el impacto</span></summary><div class="body"><span class="desc">Entender bien el problema antes de proponer soluciones.</span><div class="meta"><span>Fecha: <b contenteditable="true" data-k="d">—</b></span><span>Resultado: <b contenteditable="true" data-k="r">—</b></span><span>Enlace: —</span></div></div></details>
-    <details class="item pend"><summary><label class="ckbox"><input type="checkbox" class="ck" aria-label="Dominado"><span class="box"></span></label><span class="st">Pendiente</span><span class="name">Reproducir, revisar logs, proponer mitigación y documentar</span></summary><div class="body"><span class="desc">El método de soporte: reproducir, investigar, mitigar y dejar evidencia.</span><div class="meta"><span>Fecha: <b contenteditable="true" data-k="d">—</b></span><span>Resultado: <b contenteditable="true" data-k="r">—</b></span><span>Enlace: —</span></div></div></details>
-    <details class="item pend"><summary><label class="ckbox"><input type="checkbox" class="ck" aria-label="Dominado"><span class="box"></span></label><span class="st">Pendiente</span><span class="name">Distinguir causa, síntoma, workaround y solución permanente</span></summary><div class="body"><span class="desc">Separar lo que se ve, lo que lo produce y el arreglo definitivo.</span><div class="meta"><span>Fecha: <b contenteditable="true" data-k="d">—</b></span><span>Resultado: <b contenteditable="true" data-k="r">—</b></span><span>Enlace: —</span></div></div></details>
-    <details class="item pend"><summary><label class="ckbox"><input type="checkbox" class="ck" aria-label="Dominado"><span class="box"></span></label><span class="st">Pendiente</span><span class="name">Practicar preguntas orales, escenarios GCP y prueba en vivo</span></summary><div class="body"><span class="desc">Simulacros tipo entrevista técnica real.</span><div class="meta"><span>Fecha: <b contenteditable="true" data-k="d">—</b></span><span>Resultado: <b contenteditable="true" data-k="r">—</b></span><span>Enlace: —</span></div></div></details>
   </section>
 
   <div class="foot" id="como-editar">
@@ -337,15 +335,19 @@
       'b12-1': {h:3, l:2}, 'b12-2': {h:2, l:1}, 'b12-3': {h:4, l:3}, 'b12-4': {h:1, l:2},
       'b13-1': {h:2, l:2}, 'b13-2': {h:2, l:2}, 'b13-3': {h:2, l:2}, 'b13-4': {h:2, l:1}, 'b13-5': {h:1, l:1},
       'b14-1': {h:3, l:2}, 'b14-2': {h:3, l:2}, 'b14-3': {h:3, l:3}, 'b14-4': {h:2, l:2}, 'b14-5': {h:2, l:2}, 'b14-6': {h:3, l:3}, 'b14-7': {h:3, l:2}, 'b14-8': {h:3, l:3}, 'b14-9': {h:2, l:1},
-      'b15-1': {h:2, l:1}, 'b15-2': {h:1, l:1}, 'b15-3': {h:2, l:1}, 'b15-4': {h:1, l:1}, 'b15-5': {h:2, l:2}, 'b15-6': {h:2, l:2}, 'b15-7': {h:3, l:2}, 'b15-8': {h:3, l:2}, 'b15-9': {h:4, l:3}, 'b15-10': {h:2, l:2}, 'b15-11': {h:4, l:3},
-      'b16-1': {h:3, l:2}, 'b16-2': {h:1, l:2}, 'b16-3': {h:2, l:2}, 'b16-4': {h:2, l:2}, 'b16-5': {h:4, l:3}
+      'b15-1': {h:2, l:1}, 'b15-2': {h:1, l:1}, 'b15-3': {h:2, l:1}, 'b15-4': {h:1, l:1}, 'b15-5': {h:2, l:2}, 'b15-6': {h:2, l:2}, 'b15-7': {h:3, l:2}, 'b15-8': {h:3, l:2}, 'b15-9': {h:4, l:3}, 'b15-10': {h:2, l:2}, 'b15-11': {h:4, l:3}
     };
+    var suggestions = document.querySelector('section.suggestions');
     var TOTAL_H = 0;
-    Object.keys(META).forEach(function (k) { TOTAL_H += META[k].h; });
+    blocks.forEach(function (b) {
+      b.querySelectorAll('.item').forEach(function (it, idx) {
+        var m = META[b.id + '-' + (idx + 1)];
+        if (m) TOTAL_H += m.h;
+      });
+    });
     var CHECK = {
       14: '¿Lo dominas? Resuélvelo sin ayuda y explica la causa en inglés.',
-      15: '¿Lo dominas? Ejecútalo en consola sin ayuda y explica cada paso en inglés.',
-      16: '¿Lo dominas? Respóndelo fluido en inglés, sin rodeos.',
+      15: 'Sugerencia: ejecútalo en consola y explica cada paso en inglés.',
       d: '¿Lo dominas? Explícalo de corrido en inglés y hazlo en consola sin ayuda.'
     };
 
@@ -380,40 +382,47 @@
       persist();
     }
 
+    function setupItem(it, id, checkText) {
+      it.dataset.id = id;
+      var m = META[id];
+      if (m) {
+        var t = document.createElement('span');
+        t.className = 'tag-time';
+        t.textContent = m.h + ' h';
+        var l = document.createElement('span');
+        l.className = 'tag-lvl lvl-' + m.l;
+        l.textContent = LVL[m.l - 1];
+        var nm = it.querySelector('.name');
+        nm.parentNode.insertBefore(t, nm.nextSibling);
+        nm.parentNode.insertBefore(l, t.nextSibling);
+      }
+      var s = store[id];
+      var ck = it.querySelector('.ck');
+      var dEl = it.querySelector('[data-k="d"]');
+      var rEl = it.querySelector('[data-k="r"]');
+      if (s) {
+        if (ck && s.ck) ck.checked = true;
+        if (dEl && s.d !== undefined) dEl.textContent = s.d;
+        if (rEl && s.r !== undefined) rEl.textContent = s.r;
+      }
+      setState(it, stateOf(it));
+      if (checkText) {
+        var ch = document.createElement('div');
+        ch.className = 'check';
+        ch.textContent = checkText;
+        it.querySelector('.body').appendChild(ch);
+      }
+    }
+
     blocks.forEach(function (b) {
       var n = parseInt(b.id.slice(1), 10);
       var items = b.querySelectorAll('.item');
       var blockH = 0;
       items.forEach(function (it, idx) {
         var id = b.id + '-' + (idx + 1);
-        it.dataset.id = id;
         var m = META[id];
-        if (m) {
-          blockH += m.h;
-          var t = document.createElement('span');
-          t.className = 'tag-time';
-          t.textContent = m.h + ' h';
-          var l = document.createElement('span');
-          l.className = 'tag-lvl lvl-' + m.l;
-          l.textContent = LVL[m.l - 1];
-          var nm = it.querySelector('.name');
-          nm.parentNode.insertBefore(t, nm.nextSibling);
-          nm.parentNode.insertBefore(l, t.nextSibling);
-        }
-        var s = store[id];
-        var ck = it.querySelector('.ck');
-        var dEl = it.querySelector('[data-k="d"]');
-        var rEl = it.querySelector('[data-k="r"]');
-        if (s) {
-          if (ck && s.ck) ck.checked = true;
-          if (dEl && s.d !== undefined) dEl.textContent = s.d;
-          if (rEl && s.r !== undefined) rEl.textContent = s.r;
-        }
-        setState(it, stateOf(it));
-        var ch = document.createElement('div');
-        ch.className = 'check';
-        ch.textContent = CHECK[n] || CHECK.d;
-        it.querySelector('.body').appendChild(ch);
+        if (m) blockH += m.h;
+        setupItem(it, id, CHECK[n] || CHECK.d);
       });
       var a = document.createElement('a');
       a.href = '#' + b.id;
@@ -424,6 +433,26 @@
       bh.textContent = '· ' + blockH + ' h';
       b.querySelector('.blk-pct').parentNode.appendChild(bh);
     });
+
+    if (suggestions) {
+      var suggestionItems = suggestions.querySelectorAll('.item');
+      var suggestionH = 0;
+      suggestionItems.forEach(function (it, idx) {
+        var id = 'b15-' + (idx + 1);
+        var m = META[id];
+        if (m) suggestionH += m.h;
+        setupItem(it, id, CHECK[15]);
+      });
+      var suggestionLink = document.createElement('a');
+      suggestionLink.href = '#labs';
+      suggestionLink.innerHTML = '<b>+</b> Sugerencias de laboratorios';
+      toc.appendChild(suggestionLink);
+      var suggestionHours = document.createElement('span');
+      suggestionHours.className = 'blk-h';
+      suggestionHours.textContent = '· ' + suggestionH + ' h opcionales';
+      suggestions.querySelector('.blk-pct').parentNode.appendChild(suggestionHours);
+      suggestions.dataset.totalHours = suggestionH;
+    }
 
     function render() {
       var total = { pend: 0, prog: 0, dom: 0 };
@@ -441,6 +470,19 @@
         b.querySelector('.blk-bar i').style.width = score.toFixed(0) + '%';
         b.querySelector('.blk-pct').textContent = c.dom + '/' + n + ' dominados';
       });
+      if (suggestions) {
+        var suggestionItems = suggestions.querySelectorAll('.item');
+        var suggestionCount = { pend: 0, prog: 0, dom: 0 };
+        suggestionItems.forEach(function (it) {
+          if (it.classList.contains('prog')) suggestionCount.prog++;
+          else if (it.classList.contains('dom')) suggestionCount.dom++;
+          else suggestionCount.pend++;
+        });
+        var suggestionTotal = suggestionItems.length;
+        var suggestionScore = (suggestionCount.dom + suggestionCount.prog * 0.5) / suggestionTotal * 100;
+        suggestions.querySelector('.blk-bar i').style.width = suggestionScore.toFixed(0) + '%';
+        suggestions.querySelector('.blk-pct').textContent = suggestionCount.dom + '/' + suggestionTotal + ' completados';
+      }
       var nT = total.pend + total.prog + total.dom;
       var scoreT = (total.dom + total.prog * 0.5) / nT * 100;
       document.getElementById('bar-total').style.width = scoreT.toFixed(0) + '%';

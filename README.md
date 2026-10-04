@@ -2,7 +2,8 @@
 
 Dashboard personal para llevar el control del estudio de Google Cloud, con meta: **GCP Cloud Support Engineer** (TELUS, tentativa feb–mar 2027).
 
-- 16 bloques del temario integral (fundamentos, Linux, IAM, networking, compute, storage, bases de datos, containers, integración, observabilidad, seguridad, DevOps, fiabilidad, troubleshooting, laboratorios y entrevista).
+- 14 bloques principales del temario integral (fundamentos, Linux, IAM, networking, compute, storage, bases de datos, containers, integración, observabilidad, seguridad, DevOps, fiabilidad y troubleshooting).
+- Los laboratorios aparecen aparte como sugerencias opcionales y no cuentan en el avance principal.
 - Cada subtema tiene descripción breve, horas estimadas, dificultad y su propio checkmark.
 - El progreso se guarda en el navegador mediante `localStorage`.
 

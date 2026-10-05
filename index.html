@@ -58,6 +58,7 @@
     border-top: 1px solid var(--border);
   }
   .suggestion-intro { color: var(--muted); font-size: .8rem; margin: -.2rem 0 .6rem; }
+  .suggestions .ckbox { display: none; }
   h2 {
     font-size: .8rem; font-weight: 600; text-transform: uppercase; letter-spacing: .06em;
     color: var(--muted); border-bottom: 1px solid var(--border);
@@ -287,7 +288,7 @@
     <details class="item pend"><summary><label class="ckbox"><input type="checkbox" class="ck" aria-label="Dominado"><span class="box"></span></label><span class="st">Pendiente</span><span class="name">API deshabilitada, quota agotada, billing suspendido o IAM incorrecto</span></summary><div class="body"><span class="desc">Cuando nada funciona por un permiso, un tope o una factura.</span><div class="meta"><span>Fecha: <b contenteditable="true" data-k="d">—</b></span><span>Resultado: <b contenteditable="true" data-k="r">—</b></span><span>Enlace: —</span></div></div></details>
   </section>
 
-  <section class="suggestions" id="labs"><h2><span class="num">+</span><span class="ttl">Sugerencias de laboratorios</span><span class="blk-bar"><i></i></span><span class="blk-pct"></span></h2>
+  <section class="suggestions" id="labs"><h2><span class="num">+</span><span class="ttl">Sugerencias de laboratorios</span><span class="blk-h">· 26 h opcionales</span></h2>
     <p class="suggestion-intro">Prácticas opcionales para reforzar los temas. No cuentan en el avance principal.</p>
     <details class="item pend"><summary><label class="ckbox"><input type="checkbox" class="ck" aria-label="Dominado"><span class="box"></span></label><span class="st">Pendiente</span><span class="name">Lab 1 — Crear una VPC custom con dos subnets</span></summary><div class="body"><span class="desc">Practicar subredes pública y privada desde cero.</span><div class="meta"><span>Fecha: <b contenteditable="true" data-k="d">—</b></span><span>Resultado: <b contenteditable="true" data-k="r">—</b></span><span>Enlace: —</span></div></div></details>
     <details class="item pend"><summary><label class="ckbox"><input type="checkbox" class="ck" aria-label="Dominado"><span class="box"></span></label><span class="st">Pendiente</span><span class="name">Lab 2 — Restringir SSH a la IP propia con una firewall rule</span></summary><div class="body"><span class="desc">La regla de seguridad correcta antes de exponer cualquier máquina.</span><div class="meta"><span>Fecha: <b contenteditable="true" data-k="d">—</b></span><span>Resultado: <b contenteditable="true" data-k="r">—</b></span><span>Enlace: —</span></div></div></details>
@@ -347,7 +348,6 @@
     });
     var CHECK = {
       14: '¿Lo dominas? Resuélvelo sin ayuda y explica la causa en inglés.',
-      15: 'Sugerencia: ejecútalo en consola y explica cada paso en inglés.',
       d: '¿Lo dominas? Explícalo de corrido en inglés y hazlo en consola sin ayuda.'
     };
 
@@ -436,22 +436,14 @@
 
     if (suggestions) {
       var suggestionItems = suggestions.querySelectorAll('.item');
-      var suggestionH = 0;
       suggestionItems.forEach(function (it, idx) {
         var id = 'b15-' + (idx + 1);
-        var m = META[id];
-        if (m) suggestionH += m.h;
-        setupItem(it, id, CHECK[15]);
+        setupItem(it, id, null);
       });
       var suggestionLink = document.createElement('a');
       suggestionLink.href = '#labs';
       suggestionLink.innerHTML = '<b>+</b> Sugerencias de laboratorios';
       toc.appendChild(suggestionLink);
-      var suggestionHours = document.createElement('span');
-      suggestionHours.className = 'blk-h';
-      suggestionHours.textContent = '· ' + suggestionH + ' h opcionales';
-      suggestions.querySelector('.blk-pct').parentNode.appendChild(suggestionHours);
-      suggestions.dataset.totalHours = suggestionH;
     }
 
     function render() {
@@ -470,19 +462,6 @@
         b.querySelector('.blk-bar i').style.width = score.toFixed(0) + '%';
         b.querySelector('.blk-pct').textContent = c.dom + '/' + n + ' dominados';
       });
-      if (suggestions) {
-        var suggestionItems = suggestions.querySelectorAll('.item');
-        var suggestionCount = { pend: 0, prog: 0, dom: 0 };
-        suggestionItems.forEach(function (it) {
-          if (it.classList.contains('prog')) suggestionCount.prog++;
-          else if (it.classList.contains('dom')) suggestionCount.dom++;
-          else suggestionCount.pend++;
-        });
-        var suggestionTotal = suggestionItems.length;
-        var suggestionScore = (suggestionCount.dom + suggestionCount.prog * 0.5) / suggestionTotal * 100;
-        suggestions.querySelector('.blk-bar i').style.width = suggestionScore.toFixed(0) + '%';
-        suggestions.querySelector('.blk-pct').textContent = suggestionCount.dom + '/' + suggestionTotal + ' completados';
-      }
       var nT = total.pend + total.prog + total.dom;
       var scoreT = (total.dom + total.prog * 0.5) / nT * 100;
       document.getElementById('bar-total').style.width = scoreT.toFixed(0) + '%';
